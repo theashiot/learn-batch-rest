@@ -1,5 +1,8 @@
 package in.ashiot.batchrest;
 
+import jakarta.batch.operations.JobOperator;
+import jakarta.batch.runtime.BatchRuntime;
+import jakarta.batch.runtime.JobExecution;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +13,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -62,6 +66,8 @@ public class Main extends HttpServlet {
                 }
                 writer.println("</table>");
                 
+                writer.println("<p>Starting a job <br />");
+                writer.println("Job status: "+ doJob() +"</p>");
                 writer.println(PAGE_FOOTER);
                 writer.close();
         } finally {
@@ -71,6 +77,14 @@ public class Main extends HttpServlet {
 
     public void destroy () {
         CLIENT.close();
+    }
+
+    private String doJob() {
+        JobOperator jobOperator = BatchRuntime.getJobOperator();
+        Properties jobParameters = new Properties();
+        Long executionId = jobOperator.start("hello-job", jobParameters);
+        JobExecution jobExecution = jobOperator.getJobExecution(executionId);
+        return jobExecution.getBatchStatus().toString();
     }
 
 }
