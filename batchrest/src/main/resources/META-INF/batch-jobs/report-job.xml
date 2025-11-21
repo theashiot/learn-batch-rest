@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<job id="report-job" xmlns="https://jakarta.ee/xml/ns/jakartaee" version="2.0">>
+   <properties>
+        <property name="GITHUB_API_BASE" value="https://api.github.com/repos/wildfly/wildfly-core"/>
+        <!--"https://api.github.com/repos/infinispan/infinispan"-->
+        <!--"https://api.github.com/repos/wildfly/wildfly-core"-->
+        <!--"https://api.github.com/repos/openshift/openshift-docs-->
+        <property name="GITHUB_API_VERSION_HEADER" value="2022-11-28"/>
+  </properties>
+    <step id="firstStep">
+        <chunk item-count="5">
+            <reader ref="issueReader" />
+            <processor ref="issueProcessor" />
+            <writer ref="reportWriter" />
+        </chunk>
+    </step>
+</job>

@@ -50,11 +50,16 @@ public class ReportWriter extends AbstractItemWriter {
 
         }        
     }
+
+    @Override
+    public Serializable checkpointInfo() throws Exception {
+        return new GitIssueCheckPoint();
+    }
+
     @Override
     public void close() throws Exception {
         bos.append("</table></body></html>");
         bos.close();
-
-
-    }     
+    }
+    
 }

@@ -1,9 +1,0 @@
-<job id="hello-job">
-    <step id="firstStep">
-        <chunk item-count="1">
-            <reader ref="issueReader" />
-            <processor ref="issueProcessor" />
-            <writer ref="reportWriter" />
-        </chunk>
-    </step>
-</job>
