@@ -82,7 +82,7 @@ public class Main extends HttpServlet {
     private String doJob() {
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         Properties jobParameters = new Properties();
-        Long executionId = jobOperator.start("hello-job", jobParameters);
+        Long executionId = jobOperator.start("report-job", jobParameters);
         JobExecution jobExecution = jobOperator.getJobExecution(executionId);
         return jobExecution.getBatchStatus().toString();
     }

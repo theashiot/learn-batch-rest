@@ -28,14 +28,12 @@ public class GitIssueReader extends AbstractItemReader {
     JobContext jobContext;
     
     private int countOfIssues = 0;
-    private static final String GITHUB_API_BASE = "https://api.github.com/repos/wildfly/wildfly-core";
-        //"https://api.github.com/repos/infinispan/infinispan";    
-    private static final String GITHUB_API_VERSION_HEADER = "2022-11-28";
-    private static final Client CLIENT = ClientBuilder.newClient();
+    private Client CLIENT;
     private StringBuilder responseSB = new StringBuilder();
     private String responseString;
     private List <GitIssue> listOfGitIssues = new ArrayList<GitIssue>();
     private int count = 0;
+    private GitIssueCheckPoint checkpoint;
 
     /*
      * Initialize a Rest client and get the list of GH Issues
@@ -43,12 +41,20 @@ public class GitIssueReader extends AbstractItemReader {
 
     @Override
     public void open(Serializable previousCheckpoint) throws Exception {        
+        
+        if (previousCheckpoint == null)
+                checkpoint = new GitIssueCheckPoint();
 
-        WebTarget webTarget = CLIENT.target(GITHUB_API_BASE);
+        else {
+            checkpoint = (GitIssueCheckPoint) previousCheckpoint;
+        }
+        CLIENT = ClientBuilder.newClient();
+        jobContext.setTransientUserData(CLIENT);
+        WebTarget webTarget = CLIENT.target(jobContext.getProperties().getProperty("GITHUB_API_BASE"));
         WebTarget issuesTarget = webTarget.path("issues").queryParam("state", "open");
         Response response = issuesTarget.request(MediaType.APPLICATION_JSON)
                 .header("Accept", "application/vnd.github+json")
-                .header("X-GitHub-Api-Version", GITHUB_API_VERSION_HEADER)
+                .header("X-GitHub-Api-Version", jobContext.getProperties().getProperty("GITHUB_API_VERSION_HEADER"))
                 .get();
         
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -96,7 +102,7 @@ public class GitIssueReader extends AbstractItemReader {
 
     @Override
     public void close() {
-        //CLIENT.close();
+        CLIENT.close();
     }
 
     /**
