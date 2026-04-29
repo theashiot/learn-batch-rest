@@ -7,7 +7,18 @@
     <property name="output_file" value="output.txt"/>
   </properties>
 
-  <step id="mychunk" next="mytask">
+  <step id="mychunk1" next="mychunk2">
+    <listeners>
+      <listener ref="MyStepListener"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="50">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="mychunk2" next="mytask">
     <chunk>
       <reader ref="MyReader"></reader>
       <processor ref="MyProcessor"></processor>

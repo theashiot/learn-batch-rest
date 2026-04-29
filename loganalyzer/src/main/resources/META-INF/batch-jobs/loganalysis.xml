@@ -1,0 +1,21 @@
+<job id="loganalysis" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                      version="2.0">
+  <properties>
+    <property name="input_file" value="serverlog.log"/>
+    <property name="output_file" value="readable.log"/>
+  </properties>
+
+  <step id="logprocessor" next="cleanup">
+    <chunk checkpoint-policy="item" item-count="10">
+        <reader ref="in.ashiot.LogItemReader"></reader>
+        <processor ref="in.ashiot.LogItemProcessor"></processor>
+        <writer ref="in.ashiot.LogItemWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="cleanup">
+    <batchlet ref="in.ashiot.Cleanup"></batchlet>
+    <end on="COMPLETED"/>
+  </step>
+
+</job>

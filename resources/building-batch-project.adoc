@@ -149,6 +149,7 @@ $ cd <artifact-id>
 
 . Create a directory called `resources/META-INF/batch-jobs` inside the `src/main` directory:
 +
+[source]
 ----
 $ mkdir -p src/main/resources/META-INF/batch-jobs
 ----

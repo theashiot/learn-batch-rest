@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 import jakarta.batch.api.chunk.ItemReader;
 import jakarta.batch.runtime.context.JobContext;
+import jakarta.batch.runtime.context.StepContext;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -18,6 +19,9 @@ public class MyReader implements ItemReader{
     @Inject
     JobContext jobCtx;
 
+    @Inject
+    private StepContext stepContext;
+    
     public MyReader() {}
 
     @Override

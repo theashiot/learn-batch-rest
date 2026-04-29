@@ -12,6 +12,8 @@ public class MyProcessor implements ItemProcessor {
     @Override
     public Object processItem(Object obj) throws Exception {
         String line = (String) obj;
+        //Simulate processing delay
+        Thread.sleep(5);
         return line.toUpperCase();
     }
 }
