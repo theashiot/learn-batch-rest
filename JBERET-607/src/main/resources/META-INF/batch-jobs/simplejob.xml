@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="simplejob" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                    version="2.0" restartable="#{jobParameters['restartable']}">
+
+  <listeners>
+    <listener ref="StepCounterJobListener"/>
+  </listeners>
+
+  <properties>
+    <property name="input_file" value="input.txt"/>
+    <property name="output_file" value="output.txt"/>
+    <property name="fail.after.seconds" value="#{jobParameters['fail.after.seconds']}"/>
+  </properties>
+
+  <step id="mychunk1" next="mychunk2">
+    <listeners>
+      <listener ref="MyStepListenerOne"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="#{jobParameters['item.count']}" time-limit="#{jobParameters['time.limit']}">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="mychunk2" next="mychunk3">
+    <listeners>
+      <listener ref="MyStepListenerTwo"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="#{jobParameters['item.count']}" time-limit="#{jobParameters['time.limit']}">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="mychunk3" next="mychunk4">
+    <listeners>
+      <listener ref="MyStepListenerThree"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="#{jobParameters['item.count']}" time-limit="#{jobParameters['time.limit']}">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+    <step id="mychunk4" next="mychunk5">
+    <listeners>
+      <listener ref="MyStepListenerFour"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="#{jobParameters['item.count']}" time-limit="#{jobParameters['time.limit']}">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+    <step id="mychunk5" next="mytask">
+    <listeners>
+      <listener ref="MyStepListenerFour"/>
+    </listeners>
+    <chunk checkpoint-policy="item" item-count="#{jobParameters['item.count']}" time-limit="#{jobParameters['time.limit']}">
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="mytask">
+    <listeners>
+      <listener ref="MyStepListenerFour"/>
+    </listeners>
+    <batchlet ref="MyBatchlet"></batchlet>
+    <end on="COMPLETED"/>
+  </step>
+</job>

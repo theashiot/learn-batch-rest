@@ -1,0 +1,987 @@
+Fedora Workstation Documentation
+
+These pages are a general guide to Fedora Workstation. They provide an overview of Workstation, and are intended for Workstation users and Fedora contributors. They should be useful for those who want to know how to use Workstation, as well as those who want to know how it is put together.
+User Help
+
+The content in these pages is technical in nature. If you don’t want to know about the technical aspects of Workstation, our web page provides an introduction to what you can expect from Fedora Workstation as a user.
+
+Information on how to use the Workstation desktop can be found in the GNOME user help. This includes an overview of the desktop, as well as docs on using the apps and system settings.
+Overview
+
+Fedora Workstation is Fedora’s official desktop edition. It provides a powerful, easy to use desktop experience. Workstation is intended to be a great general purpose desktop. It also aims to be a fantastic platform for software developers.
+
+Workstation is part of the Fedora project. As such, it shares components, tools, and processes with other Fedora Editions and Spins. However, Workstation is also an independent project, which is able to make its own design and technical decisions, and is a distinct product of its own.
+
+The Workstation Working Group is the team that has responsibility for Fedora Workstation. However, Workstation wouldn’t be possible without the hard work of teams and individuals across the entire Fedora community.
+System Requirements
+
+To have a good experience, hardware with a 40GB SSD disk and 4GB RAM is recommended for Fedora Workstation. However, it is possible to use hardware with lower specifications.
+
+Workstation images are available for x86_64 and aarch64 architectures, providing support for Intel, AMD and ARM processors.
+Getting Workstation
+
+Fedora Workstation comes preinstalled on a number of hardware options. It can also be manually installed using a USB flash drive. The Fedora Workstation download page provides information on how to do this.
+What’s Included
+
+Workstation is built from open source components, many of which are shared with other Fedora Editions and Spins. Key components include the Linux kernel, systemd, DNF, the Wayland display server, the Pipewire multimedia server, NetworkManager, the GNOME Desktop, and the Firefox browser. Each of these components are carefully integrated and tested, to work together as part of a seamless experience.
+
+Workstation also includes a default set of preinstalled applications, to make it easy to get started, and to provide the range of standard utilities that are necessary for a desktop.
+
+In order to prevent Workstation systems from becoming unusable, certain key components are required to be installed, and cannot be removed. These non-removable components include gnome-shell, gnome-control-center, grub, and NetworkManager.
+Getting Involved
+
+There are lots of ways to participate in Fedora Workstation. For users, the best places to start include:
+
+    Participating in Fedora Discussions
+
+    Chatting in the #workstation channel
+
+    Providing support to other users in Ask Fedora
+
+If you want to help with Fedora Workstation, there are also lots of teams that you can join, including:
+
+    Fedora project teams, including Websites, Design, QA, Packaging and Documentation.
+
+    Upstream projects, particularly the GNOME Project, which is responsible for much of the Workstation experience.
+
+    The Workstation Working Group, which is open to anyone who wants to be involved in the day to day decisions around Workstation.
+
+Jakarta Batch
+	
+
+This section was last updated for Jakarta EE Version 9.1
+
+This chapter describes Jakarta Batch, which provides support for defining, implementing, and running batch jobs. Batch jobs are tasks that can be executed without user interaction. The batch framework is composed of a job specification language based on XML, a Java API, and a batch runtime.
+Introduction to Batch Processing
+
+Some enterprise applications contain tasks that can be executed without user interaction. These tasks are executed periodically or when resource usage is low, and they often process large amounts of information such as log files, database records, or images. Examples include billing, report generation, data format conversion, and image processing. These tasks are called batch jobs.
+
+Batch processing refers to running batch jobs on a computer system. Jakarta EE includes a batch processing framework that provides the batch execution infrastructure common to all batch applications, enabling developers to concentrate on the business logic of their batch applications. The batch framework consists of a job specification language based on XML, a set of batch annotations and interfaces for application classes that implement the business logic, a batch container that manages the execution of batch jobs, and supporting classes and interfaces to interact with the batch container.
+
+A batch job can be completed without user intervention. For example, consider a telephone billing application that reads phone call records from the enterprise information systems and generates a monthly bill for each account. Since this application does not require any user interaction, it can run as a batch job.
+
+The phone billing application consists of two phases: The first phase associates each call from the registry with a monthly bill, and the second phase calculates the tax and total amount due for each bill. Each of these phases is a step of the batch job.
+
+Batch applications specify a set of steps and their execution order. Different batch frameworks may specify additional elements, like decision elements or groups of steps that run in parallel. The following sections describe steps in more detail and provide information about other common characteristics of batch frameworks.
+Steps in Batch Jobs
+
+A step is an independent and sequential phase of a batch job. Batch jobs contain chunk-oriented steps and task-oriented steps.
+
+    Chunk-oriented steps (chunk steps) process data by reading items from a data source, applying some business logic to each item, and storing the results. Chunk steps read and process one item at a time and group the results into a chunk. The results are stored when the chunk reaches a configurable size. Chunk-oriented processing makes storing results more efficient and facilitates transaction demarcation.
+
+    Chunk steps have three parts.
+
+        The input retrieval part reads one item at a time from a data source, such as entries on a database, files in a directory, or entries in a log file.
+
+        The business processing part manipulates one item at a time using the business logic defined by the application. Examples include filtering, formatting, and accessing data from the item for computing a result.
+
+        The output writing part stores a chunk of processed items at a time.
+
+Chunk steps are often long-running because they process large amounts of data. Batch frameworks enable chunk steps to bookmark their progress using checkpoints. A chunk step that is interrupted can be restarted from the last checkpoint. The input retrieval and output writing parts of a chunk step save their current position after the processing of each chunk, and can recover it when the step is restarted.
+
+Figure 1, “Chunk Steps in a Batch Job” shows the three parts of two steps in a batch job.
+This figure shows a batch job that contains two chunk steps: step A and step B. Step A has the three parts of a chunk-oriented step: input retrieval A, business processing A, and output writing A. Step B also has the three parts of a chunk-oriented step: input retrieval B, business processing B, and output writing B.
+Figure 1. Chunk Steps in a Batch Job
+
+For example, the phone billing application consists of two chunk steps.
+
+    In the first step, the input retrieval part reads call records from the registry; the business processing part associates each call with a bill and creates a bill if one does not exist for an account; and the output writing part stores each bill in a database.
+
+    In the second step, the input retrieval part reads bills from the database; the business processing part calculates the tax and total amount due for each bill; and the output writing part updates the database records and generates printable versions of each bill.
+
+This application could also contain a task step that cleaned up the files from the bills generated for the previous month.
+Parallel Processing
+
+Batch jobs often process large amounts of data or perform computationally expensive operations. Batch applications can benefit from parallel processing in two scenarios.
+
+    Steps that do not depend on each other can run on different threads.
+
+    Chunk-oriented steps where the processing of each item does not depend on the results of processing previous items can run on more than one thread.
+
+Batch frameworks provide mechanisms for developers to define groups of independent steps and to split chunk-oriented steps in parts that can run in parallel.
+Status and Decision Elements
+
+Batch frameworks keep track of a status for every step in a job. The status indicates if a step is running or if it has completed. If the step has completed, the status indicates one of the following.
+
+    The execution of the step was successful.
+
+    The step was interrupted.
+
+    An error occurred in the execution of the step.
+
+In addition to steps, batch jobs can also contain decision elements. Decision elements use the exit status of the previous step to determine the next step or to terminate the batch job. Decision elements set the status of the batch job when terminating it. Like a step, a batch job can terminate successfully, be interrupted, or fail.
+
+Figure 2, “Steps and Decision Elements in a Job” shows an example of a job that contains chunk steps, task steps and a decision element.
+This figure shows a batch job that contains two chunk steps, a task step and a decision element. The job starts with chunk step A, continues with chunk step B, and then decision element D evaluates condition 1. The condition is based on the status of step B. If condition 1 is true, the job terminates; otherwise the job continues with step C and then the job ends.
+Figure 2. Steps and Decision Elements in a Job
+Batch Framework Functionality
+
+Batch applications have the following common requirements.
+
+    Define jobs, steps, decision elements, and the relationships between them.
+
+    Execute some groups of steps or parts of a step in parallel.
+
+    Maintain state information for jobs and steps.
+
+    Launch jobs and resume interrupted jobs.
+
+    Handle errors.
+
+Batch frameworks provide the batch execution infrastructure that addresses the common requirements of all batch applications, enabling developers to concentrate on the business logic of their applications. Batch frameworks consist of a format to specify jobs and steps, an application programming interface (API), and a service available at runtime that manages the execution of batch jobs.
+Batch Processing in Jakarta EE
+
+This section lists the components of the batch processing framework in Jakarta EE and provides an overview of the steps you have to follow to create a batch application.
+The Batch Processing Framework
+
+Jakarta EE includes a batch processing framework that consists of the following elements:
+
+    A batch runtime that manages the execution of jobs
+
+    A job specification language based on XML
+
+    A Java API to interact with the batch runtime
+
+    A Java API to implement steps, decision elements, and other batch artifacts
+
+Batch applications in Jakarta EE contain XML files and Java classes. The XML files define the structure of a job in terms of batch artifacts and the relationships between them. (A batch artifact is a part of a chunk-oriented step, a task-oriented step, a decision element, or another component of a batch application). The Java classes implement the application logic of the batch artifacts defined in the XML files. The batch runtime parses the XML files and loads the batch artifacts as Java classes to run the jobs in a batch application.
+Creating Batch Applications
+
+The process for creating a batch application in Jakarta EE is the following.
+
+    Design the batch application.
+
+        Identify the input sources, the format of the input data, the desired final result, and the required processing phases.
+
+        Organize the application as a job with chunk-oriented steps, task-oriented steps, and decision elements. Determine the dependencies between them.
+
+        Determine the order of execution in terms of transitions between steps.
+
+        Identify steps that can run in parallel and steps that can run in more than one thread.
+
+    Create the batch artifacts as Java classes by implementing the interfaces specified by the framework for steps, decision elements, and so on. These Java classes contain the code to read data from input sources, format items, process items, and store results. Batch artifacts can access context objects from the batch runtime using dependency injection.
+
+    Define jobs, steps, and their execution flow in XML files using the Job Specification Language. The elements in the XML files reference batch artifacts implemented as Java classes. The batch artifacts can access properties declared in the XML files, such as names of files and databases.
+
+    Use the Java API provided by the batch runtime to launch the batch application.
+
+The following sections describe in detail how to use the components of the batch processing framework in Jakarta EE to create batch applications.
+Elements of a Batch Job
+
+A batch job can contain one or more of the following elements:
+
+    Steps
+
+    Flows
+
+    Splits
+
+    Decision elements
+
+Steps are described in Introduction to Batch Processing, and can be chunk-oriented or task-oriented. Chunk-oriented steps can be partitioned steps. In a partitioned chunk step, the processing of one item does not depend on other items, so these steps can run in more than one thread.
+
+A flow is a sequence of steps that execute as a unit. A sequence of related steps can be grouped together into a flow. The steps in a flow cannot transition to steps outside the flow. The flow transitions to the next element when its last step completes.
+
+A split is a set of flows that execute in parallel; each flow runs on a separate thread. The split transitions to the next element when all its flows complete.
+
+Decision elements use the exit status of the previous step to determine the next step or to terminate the batch job.
+Properties and Parameters
+
+Jobs and steps can have a number of properties associated with them. You define properties in the job definition file, and batch artifacts access these properties using context objects from the batch runtime. Using properties in this manner enables you to decouple static parameters of the job from the business logic and to reuse batch artifacts in different job definition files.
+
+Specifying properties is described in Using the Job Specification Language, and accessing properties in batch artifacts is described in Creating Batch Artifacts.
+
+Jakarta EE applications can also pass parameters to a job when they submit it to the batch runtime. This enables you to specify dynamic parameters that are only known at runtime. Parameters are also necessary for partitioned steps, since each partition needs to know, for example, what range of items to process.
+
+Specifying parameters when submitting jobs is described in Submitting Jobs to the Batch Runtime. Specifying parameters for partitioned steps and accessing them in batch artifacts is demonstrated in The phonebilling Example Application.
+Job Instances and Job Executions
+
+A job definition can have multiple instances, each with different parameters. A job execution is an attempt to run a job instance. The batch runtime maintains information about job instances and job executions, as described in Checking the Status of a Job.
+Batch and Exit Status
+
+The state of jobs, steps, splits, and flows is represented in the batch runtime as a batch status value. Batch status values are listed Batch Status Values. They are represented as strings.
+Batch Status Values Value 	Description
+
+STARTING
+	
+
+The job has been submitted to the batch runtime.
+
+STARTED
+	
+
+The job is running.
+
+STOPPING
+	
+
+The job has been requested to stop.
+
+STOPPED
+	
+
+The job has stopped.
+
+FAILED
+	
+
+The job finished executing because of an error.
+
+COMPLETED
+	
+
+The job finished executing successfully.
+
+ABANDONED
+	
+
+The job was marked abandoned.
+
+Jakarta EE applications can submit jobs and access the batch status of a job using the JobOperator interface, as described in Submitting Jobs to the Batch Runtime. Job definition files can refer to batch status values using the Job Specification Language (JSL), as described in Using the Job Specification Language. Batch artifacts can access batch status values using context objects, as described in Using the Context Objects from the Batch Runtime.
+
+For flows, the batch status is that of its last step. For splits, the batch status is the following:
+
+    COMPLETED: If all its flows have a batch status of COMPLETED
+
+    FAILED: If any flow has a batch status of FAILED
+
+    STOPPED: If any flow has a batch status of STOPPED, and no flows have a batch status of FAILED
+
+The batch status for jobs, steps, splits, and flows is set by the batch runtime. Jobs, steps, splits, and flows also have an exit status, which is a user-defined value based on the batch status. You can set the exit status inside batch artifacts or in the job definition file. You can access the exit status in the same manner as the batch status, described above. The default value for the exit status is the same as the batch status.
+
+Simple Use Case
+
+This section demonstrates how to define a simple job using the Job Specification Language (JSL) and how to implement the corresponding batch artifacts. Refer to the rest of the sections in this chapter for detailed descriptions of the elements in the batch framework.
+
+The following job definition specifies a chunk step and a task step as follows:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="simplejob" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                    version="2.0">
+  <properties>
+    <property name="input_file" value="input.txt"/>
+    <property name="output_file" value="output.txt"/>
+  </properties>
+  <step id="mychunk" next="mytask">
+    <chunk>
+      <reader ref="MyReader"></reader>
+      <processor ref="MyProcessor"></processor>
+      <writer ref="MyWriter"></writer>
+    </chunk>
+  </step>
+  <step id="mytask">
+    <batchlet ref="MyBatchlet"></batchlet>
+    <end on="COMPLETED"/>
+  </step>
+</job>
+
+Chunk Step
+
+In most cases, you have to implement a checkpoint class for chunk-oriented steps. The following class just keeps track of the line number in a text file:
+
+public class MyCheckpoint implements Serializable {
+    private long lineNum = 0;
+    public void increase() { lineNum++; }
+    public long getLineNum() { return lineNum; }
+}
+
+The following item reader implementation continues reading the input file from the provided checkpoint if the job was restarted. The items consist of each line in the text file (in more complex scenarios, the items are custom Java types and the input source can be a database):
+
+@Dependent
+@Named("MyReader")
+public class MyReader implements jakarta.batch.api.chunk.ItemReader {
+    private MyCheckpoint checkpoint;
+    private BufferedReader breader;
+    @Inject
+    JobContext jobCtx;
+
+    public MyReader() {}
+
+    @Override
+    public void open(Serializable ckpt) throws Exception {
+        if (ckpt == null)
+            checkpoint = new MyCheckpoint();
+        else
+            checkpoint = (MyCheckpoint) ckpt;
+        String fileName = jobCtx.getProperties()
+                                .getProperty("input_file");
+        breader = new BufferedReader(new FileReader(fileName));
+        for (long i = 0; i < checkpoint.getLineNum(); i++)
+            breader.readLine();
+    }
+
+    @Override
+    public void close() throws Exception {
+        breader.close();
+    }
+
+    @Override
+    public Object readItem() throws Exception {
+        String line = breader.readLine();
+        return line;
+    }
+}
+
+In the following case, the item processor only converts the line to uppercase. More complex examples can process items in different ways or transform them into custom output Java types:
+
+@Dependent
+@Named("MyProcessor")
+public class MyProcessor implements jakarta.batch.api.chunk.ItemProcessor {
+    public MyProcessor() {}
+
+    @Override
+    public Object processItem(Object obj) throws Exception {
+        String line = (String) obj;
+        return line.toUpperCase();
+    }
+}
+
+	The batch processing API does not support generics. In most cases, you need to cast items to their specific type before processing them.
+
+The item writer writes the processed items to the output file. It overwrites the output file if no checkpoint is provided; otherwise, it resumes writing at the end of the file. Items are written in chunks:
+
+@Dependent
+@Named("MyWriter")
+public class MyWriter implements jakarta.batch.api.chunk.ItemWriter {
+    private BufferedWriter bwriter;
+    @Inject
+    private JobContext jobCtx;
+
+    @Override
+    public void open(Serializable ckpt) throws Exception {
+        String fileName = jobCtx.getProperties()
+                                .getProperty("output_file");
+        bwriter = new BufferedWriter(new FileWriter(fileName,
+                                                    (ckpt != null)));
+    }
+
+    @Override
+    public void writeItems(List<Object> items) throws Exception {
+        for (int i = 0; i < items.size(); i++) {
+            String line = (String) items.get(i);
+            bwriter.write(line);
+            bwriter.newLine();
+        }
+    }
+
+    @Override
+    public Serializable checkpointInfo() throws Exception {
+        return new MyCheckpoint();
+    }
+}
+
+Task Step
+
+The task step displays the length of the output file. In more complex scenarios, task steps perform any task that does not fit the chunk processing programming model:
+
+@Dependent
+@Named("MyBatchlet")
+public class MyBatchlet implements jakarta.batch.api.chunk.Batchlet {
+    @Inject
+    private JobContext jobCtx;
+
+    @Override
+    public String process() throws Exception {
+        String fileName = jobCtx.getProperties()
+                                .getProperty("output_file");
+        System.out.println(""+(new File(fileName)).length());
+        return "COMPLETED";
+    }
+}
+
+Using the Job Specification Language
+
+The Job Specification Language (JSL) enables you to define the steps in a job and their execution order using an XML file. The following example shows how to define a simple job that contains one chunk step and one task step:
+
+<job id="loganalysis" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                      version="2.0">
+  <properties>
+    <property name="input_file" value="input1.txt"/>
+    <property name="output_file" value="output2.txt"/>
+  </properties>
+
+  <step id="logprocessor" next="cleanup">
+    <chunk checkpoint-policy="item" item-count="10">
+      <reader ref="com.example.pkg.LogItemReader"></reader>
+      <processor ref="com.example.pkg.LogItemProcessor"></processor>
+      <writer ref="com.example.pkg.LogItemWriter"></writer>
+    </chunk>
+  </step>
+
+  <step id="cleanup">
+    <batchlet ref="com.example.pkg.CleanUp"></batchlet>
+    <end on="COMPLETED"/>
+  </step>
+</job>
+
+This example defines the loganalysis batch job, which consists of the logprocessor chunk step and the cleanup task step. The logprocessor step transitions to the cleanup step, which terminates the job when completed.
+
+The job element defines two properties, input_file and output_file. Specifying properties in this manner enables you to run a batch job with different configuration parameters without having to recompile its Java batch artifacts. The batch artifacts can access these properties using the context objects from the batch runtime.
+
+The logprocessor step is a chunk step that specifies batch artifacts for the reader (LogItemReader), the processor (LogItemProcessor), and the writer (LogItemWriter). This step creates a checkpoint for every ten items processed.
+
+The cleanup step is a task step that specifies the CleanUp class as its batch artifact. The job terminates when this step completes.
+
+The following sections describe the elements of the Job Specification Language (JSL) in more detail and show the most common attributes and child elements.
+The job Element
+
+The job element is always the top-level element in a job definition file. Its main attributes are id and restartable. The job element can contain one properties element and zero or more of each of the following elements: listener, step, flow, and split. For example:
+
+<job id="jobname" restartable="true">
+  <listeners>
+    <listener ref="com.example.pkg.ListenerBatchArtifact"/>
+  </listeners>
+  <properties>
+    <property name="propertyName1" value="propertyValue1"/>
+    <property name="propertyName2" value="propertyValue2"/>
+  </properties>
+  <step ...> ... </step>
+  <step ...> ... </step>
+  <decision ...> ... </decision>
+  <flow ...> ... </flow>
+  <split ...> ... </split>
+</job>
+
+The listener element specifies a batch artifact whose methods are invoked before and after the execution of the job. The batch artifact is an implementation of the jakarta.batch.api.listener.JobListener interface. See The Listener Batch Artifacts for an example of a job listener implementation.
+
+The first step, flow, or split element inside the job element executes first.
+The step Element
+
+The step element can be a child of the job and flow elements. Its main attributes are id and next. The step element can contain the following elements.
+
+    One chunk element for chunk-oriented steps or one batchlet element for task-oriented steps.
+
+    One properties element (optional).
+
+    This element specifies a set of properties that batch artifacts can access using batch context objects.
+
+    One listener element (optional); one listeners element if more than one listener is specified.
+
+    This element specifies listener artifacts that intercept various phases of step execution.
+
+    For chunk steps, the batch artifacts for these listeners can be implementations of the following interfaces: StepListener, ItemReadListener, ItemProcessListener, ItemWriteListener, ChunkListener, RetryReadListener, RetryProcessListener, RetryWriteListener, SkipReadListener, SkipProcessListener, and SkipWriteListener.
+
+    For task steps, the batch artifact for these listeners must be an implementation of the StepListener interface.
+
+    See The Listener Batch Artifacts for an example of an item processor listener implementation.
+
+    One partition element (optional).
+
+    This element is used in partitioned steps which execute in more than one thread.
+
+    One end element if this is the last step in a job.
+
+    This element sets the batch status to COMPLETED.
+
+    One stop element (optional) to stop a job at this step.
+
+    This element sets the batch status to STOPPED.
+
+    One fail element (optional) to terminate a job at this step.
+
+    This element sets the batch status to FAILED.
+
+    One or more next elements if the next attribute is not specified.
+
+    This element is associated with an exit status and refers to another step, a flow, a split, or a decision element.
+
+The following is an example of a chunk step:
+
+<step id="stepA" next="stepB">
+  <properties> ... </properties>
+  <listeners>
+    <listener ref="MyItemReadListenerImpl"/>
+    ...
+  </listeners>
+  <chunk ...> ... </chunk>
+  <partition> ... </partition>
+  <end on="COMPLETED" exit-status="MY_COMPLETED_EXIT_STATUS"/>
+  <stop on="MY_TEMP_ISSUE_EXIST_STATUS" restart="step0"/>
+  <fail on="MY_ERROR_EXIT_STATUS" exit-status="MY_ERROR_EXIT_STATUS"/>
+</step>
+
+The following is an example of a task step:
+
+<step id="stepB" next="stepC">
+  <batchlet ...> ... </batchlet>
+  <properties> ... </properties>
+  <listener ref="MyStepListenerImpl"/>
+</step>
+
+The chunk Element
+
+The chunk element is a child of the step element for chunk-oriented steps. The attributes of this element are listed in Attributes of the chunk Element.
+Attributes of the chunk Element Attribute Name 	Description 	Default Value
+
+checkpoint-policy
+	
+
+Specifies how to commit the results of processing each chunk:
+
+    "item": the chunk is committed after processing item-count items
+
+    "custom": the chunk is committed according to a checkpoint algorithm specified with the checkpoint-algorithm element
+
+The checkpoint is updated when the results of a chunk are committed.
+
+Every chunk is processed in a global Jakarta EE transaction. If the processing of one item in the chunk fails, the transaction is rolled back and no processed items from this chunk are stored.
+	
+
+"item"
+
+item-count
+	
+
+Specifies the number of items to process before committing the chunk and taking a checkpoint.
+	
+
+10
+
+time-limit
+	
+
+Specifies the number of seconds before committing the chunk and taking a checkpoint when checkpoint-policy="item".
+
+If item-count items have not been processed by time-limit seconds, the chunk is committed and a checkpoint is taken.
+	
+
+0 (no limit)
+
+buffer-items
+	
+
+Specifies if processed items are buffered until it is time to take a checkpoint. If true, a single call to the item writer is made with a list of the buffered items before committing the chunk and taking a checkpoint.
+	
+
+true
+
+skip-limit
+	
+
+Specifies the number of skippable exceptions to skip in this step during chunk processing. Skippable exception classes are specified with the skippable-exception-classes element.
+	
+
+No limit
+
+retry-limit
+	
+
+Specifies the number of attempts to execute this step if retryable exceptions occur. Retryable exception classes are specified with the retryable-exception-classes element.
+	
+
+No limit
+
+The chunk element can contain the following elements.
+
+    One reader element.
+
+    This element specifies a batch artifact that implements the ItemReader interface.
+
+    One processor element.
+
+    This element specifies a batch artifact that implements the ItemProcessor interface.
+
+    One writer element.
+
+    This element specifies a batch artifact that implements the ItemWriter interface.
+
+    One checkpoint-algorithm element (optional).
+
+    This element specifies a batch artifact that implements the CheckpointAlgorithm interface and provides a custom checkpoint policy.
+
+    One skippable-exception-classes element (optional).
+
+    This element specifies a set of exceptions thrown from the reader, writer, and processor batch artifacts that chunk processing should skip. The skip-limit attribute from the chunk element specifies the maximum number of skipped exceptions.
+
+    One retryable-exception-classes element (optional).
+
+    This element specifies a set of exceptions thrown from the reader, writer, and processor batch artifacts that chunk processing will retry. The retry-limit attribute from the chunk element specifies the maximum number of attempts.
+
+    One no-rollback-exception-classes element (optional).
+
+    This element specifies a set of exceptions thrown from the reader, writer, and processor batch artifacts that should not cause the batch runtime to roll back the current chunk, but to retry the current operation without a rollback instead.
+
+    For exception types not specified in this element, the current chunk is rolled back by default when an exception occurs.
+
+The following is an example of a chunk-oriented step:
+
+<step id="stepC" next="stepD">
+  <chunk checkpoint-policy="item" item-count="5" time-limit="180"
+         buffer-items="true" skip-limit="10" retry-limit="3">
+    <reader ref="pkg.MyItemReaderImpl"></reader>
+    <processor ref="pkg.MyItemProcessorImpl"></processor>
+    <writer ref="pkg.MyItemWriterImpl"></writer>
+    <skippable-exception-classes>
+      <include class="pkg.MyItemException"/>
+      <exclude class="pkg.MyItemSeriousSubException"/>
+    </skippable-exception-classes>
+    <retryable-exception-classes>
+      <include class="pkg.MyResourceTempUnavailable"/>
+    </retryable-exception-classes>
+  </chunk>
+</step>
+
+This example defines a chunk step and specifies its reader, processor, and writer artifacts. The step updates a checkpoint and commits each chunk after processing five items. It skips all MyItemException exceptions and all its subtypes, except for MyItemSeriousSubException, up to a maximum of ten skipped exceptions. The step retries a chunk when a MyResourceTempUnavailable exception occurs, up to a maximum of three attempts.
+The batchlet Element
+
+The batchlet element is a child of the step element for task-oriented steps. This element only has the ref attribute, which specifies a batch artifact that implements the Batchlet interface. The batch element can contain a properties element.
+
+The following is an example of a task-oriented step:
+
+<step id="stepD" next="stepE">
+  <batchlet ref="pkg.MyBatchletImpl">
+    <properties>
+      <property name="pname" value="pvalue"/>
+    </properties>
+  </batchlet>
+</step>
+
+This example defines a batch step and specifies its batch artifact.
+The partition Element
+
+The partition element is a child of the step element. It indicates that a step is partitioned. Most partitioned steps are chunk steps where the processing of each item does not depend on the results of processing previous items. You specify the number of partitions in a step and provide each partition with specific information on which items to process, such as the following.
+
+    A range of items. For example, partition 1 processes items 1 through 500, and partition 2 processes items 501 through 1000.
+
+    An input source. For example, partition 1 processes the items in input1.txt and partition 2 processes the items in input2.txt.
+
+When the number of partitions, the number of items, and the input sources for a partitioned step are known at development or deployment time, you can use partition properties in the job definition file to specify partition-specific information and access these properties from the step batch artifacts. The runtime creates as many instances of the step batch artifacts (reader, processor, and writer) as partitions, and each artifact instance receives the properties specific to its partition.
+
+In most cases, the number of partitions, the number of items, or the input sources for a partitioned step can only be determined at runtime. Instead of specifying partition-specific properties statically in the job definition file, you provide a batch artifact that can access your data sources at runtime and determine how many partitions are needed and what range of items each partition should process. This batch artifact is an implementation of the PartitionMapper interface. The batch runtime invokes this artifact and then uses the information it provides to instantiate the step batch artifacts (reader, writer, and processor) for each partition and to pass them partition-specific data as parameters.
+
+The rest of this section describes the partition element in detail and shows two examples of job definition files: one that uses partition properties to specify a range of items for each partition, and one that relies on a PartitionMapper implementation to determine partition-specific information.
+
+See The Phone Billing Chunk Step in The phonebilling Example Application for a complete example of a partitioned chunk step.
+
+The partition element can contain the following elements.
+
+    One plan element, if the mapper element is not specified.
+
+    This element defines the number of partitions, the number of threads, and the properties for each partition in the job definition file. The plan element is useful when this information is known at development or deployment time.
+
+    One mapper element, if the plan element is not specified.
+
+    This element specifies a batch artifact that provides the number of partitions, the number of threads, and the properties for each partition. The batch artifact is an implementation of the PartitionMapper interface. You use this option when the information required for each partition is only known at runtime.
+
+    One reducer element (optional).
+
+    This element specifies a batch artifact that receives control when a partitioned step begins, ends, or rolls back. The batch artifact enables you to merge results from different partitions and perform other related operations. The batch artifact is an implementation of the PartitionReducer interface.
+
+    One collector element (optional).
+
+    This element specifies a batch artifact that sends intermediary results from each partition to a partition analyzer. The batch artifact sends the intermediary results after each checkpoint for chunk steps and at the end of the step for task steps. The batch artifact is an implementation of the PartitionCollector interface.
+
+    One analyzer element (optional).
+
+    This element specifies a batch artifact that analyzes the intermediary results from the partition collector instances. The batch artifact is an implementation of the PartitionAnalyzer interface.
+
+The following is an example of a partitioned step using the plan element:
+
+<step id="stepE" next="stepF">
+  <chunk>
+    <reader ...></reader>
+    <processor ...></processor>
+    <writer ...></writer>
+  </chunk>
+  <partition>
+    <plan partitions="2" threads="2">
+      <properties partition="0">
+        <property name="firstItem" value="0"/>
+        <property name="lastItem" value="500"/>
+      </properties>
+      <properties partition="1">
+        <property name="firstItem" value="501"/>
+        <property name="lastItem" value="999"/>
+      </properties>
+    </plan>
+  </partition>
+  <reducer ref="MyPartitionReducerImpl"/>
+  <collector ref="MyPartitionCollectorImpl"/>
+  <analyzer ref="MyPartitionAnalyzerImpl"/>
+</step>
+
+In this example, the plan element specifies the properties for each partition in the job definition file.
+
+The following example uses a mapper element instead of a plan element. The PartitionMapper implementation dynamically provides the same information as the plan element provides in the job definition file:
+
+<step id="stepE" next="stepF">
+  <chunk>
+    <reader ...></reader>
+    <processor ...></processor>
+    <writer ...></writer>
+  </chunk>
+  <partition>
+    <mapper ref="MyPartitionMapperImpl"/>
+    <reducer ref="MyPartitionReducerImpl"/>
+    <collector ref="MyPartitionCollectorImpl"/>
+    <analyzer ref="MyPartitionAnalyzerImpl"/>
+  </partition>
+</step>
+
+Refer to The phonebilling Example Application for an example implementation of the PartitionMapper interface.
+The flow Element
+
+The flow element can be a child of the job, flow, and split elements. Its attributes are id and next. Flows can transition to flows, steps, splits, and decision elements. The flow element can contain the following elements:
+
+    One or more step elements
+
+    One or more flow elements (optional)
+
+    One or more split elements (optional)
+
+    One or more decision elements (optional)
+
+The last step in a flow is the one with no next attribute or next element. Steps and other elements in a flow cannot transition to elements outside the flow.
+
+The following is an example of the flow element:
+
+<flow id="flowA" next="stepE">
+  <step id="flowAstepA" next="flowAstepB">...</step>
+  <step id="flowAstepB" next="flowAflowC">...</step>
+  <flow id="flowAflowC" next="flowAsplitD">...</flow>
+  <split id="flowAsplitD" next="flowAstepE">...</split>
+  <step id="flowAstepE">...</step>
+</flow>
+
+This example flow contains three steps, one flow, and one split. The last step does not have the next attribute. The flow transitions to stepE when its last step completes.
+The split Element
+
+The split element can be a child of the job and flow elements. Its attributes are id and next. Splits can transition to splits, steps, flows, and decision elements. The split element can only contain one or more flow elements that can only transition to other flow elements in the split.
+
+The following is an example of a split with three flows that execute concurrently:
+
+<split id="splitA" next="stepB">
+  <flow id="splitAflowA">...</flow>
+  <flow id="splitAflowB">...</flow>
+  <flow id="splitAflowC">...</flow>
+</split>
+
+The decision Element
+
+The decision element can be a child of the job and flow elements. Its attributes are id and next. Steps, flows, and splits can transition to a decision element. This element specifies a batch artifact that decides the next step, flow, or split to execute based on information from the execution of the previous step, flow, or split. The batch artifact implements the Decider interface. The decision element can contain the following elements.
+
+    One or more end elements (optional).
+
+    This element sets the batch status to COMPLETED.
+
+    One or more stop elements (optional).
+
+    This element sets the batch status to STOPPED.
+
+    One or more fail elements (optional).
+
+    This element sets the batch status to FAILED.
+
+    One or more next elements (optional).
+
+    One properties element (optional).
+
+The following is an example of the decider element:
+
+<decision id="decisionA" ref="MyDeciderImpl">
+  <fail on="FAILED" exit-status="FAILED_AT_DECIDER"/>
+  <end on="COMPLETED" exit-status="COMPLETED_AT_DECIDER"/>
+  <stop on="MY_TEMP_ISSUE_EXIST_STATUS" restart="step2"/>
+</decision>
+
+Creating Batch Artifacts
+
+After you define a job in terms of its batch artifacts using the Job Specification Language (JSL), you create these artifacts as Java classes that implement the interfaces in the jakarta.batch.api package and its subpackages.
+
+This section lists the main batch artifact interfaces, demonstrates how to access context objects from the batch runtime, and provides some examples.
+Batch Artifact Interfaces
+
+The following tables list the interfaces that you implement to create batch artifacts. The interface implementations are referenced from the elements described in Using the Job Specification Language.
+
+Main Batch Artifact Interfaces lists the interfaces to implement batch artifacts for chunk steps, task steps, and decision elements.
+
+Partition Batch Artifact Interfaces lists the interfaces to implement batch artifacts for partitioned steps.
+
+Listener Batch Artifact Interfaces lists the interfaces to implement batch artifacts for job and step listeners.
+Main Batch Artifact Interfaces Package 	Interface 	Description
+
+jakarta.batch.api
+	
+
+Batchlet
+	
+
+Implements the business logic of a task-oriented step. It is referenced from the batchlet element.
+
+jakarta.batch.api
+	
+
+Decider
+	
+
+Decides the next step, flow, or split to execute based on information from the execution of the previous step, flow, or split. It is referenced from the decision element.
+
+jakarta.batch.api.chunk
+	
+
+CheckPointAlgorithm
+	
+
+Implements a custom checkpoint policy for chunk steps. It is referenced from the checkpoint-algorithm element inside the chunk element.
+
+jakarta.batch.api.chunk
+	
+
+ItemReader
+	
+
+Reads items from an input source in a chunk step. It is referenced from the reader element inside the chunk element.
+
+jakarta.batch.api.chunk
+	
+
+ItemProcessor
+	
+
+Processes input items to obtain output items in chunk steps. It is referenced from the processor element inside the chunk element.
+
+jakarta.batch.api.chunk
+	
+
+ItemWriter
+	
+
+Writes output items in chunk steps. It is referenced from the writer element inside the chunk element.
+Partition Batch Artifact Interfaces Package 	Interface 	Description
+
+jakarta.batch.api.partition
+	
+
+PartitionPlan
+	
+
+Provides details on how to execute a partitioned step, such as the number of partitions, the number of threads, and the parameters for each partition. This artifact is not referenced directly from the job definition file.
+
+jakarta.batch.api.partition
+	
+
+PartitionMapper
+	
+
+Provides a PartitionPlan object. It is referenced from the mapper element inside the partition element.
+
+jakarta.batch.api.partition
+	
+
+PartitionReducer
+	
+
+Receives control when a partitioned step begins, ends, or rolls back. It is referenced from the reducer element inside the partition element.
+
+jakarta.batch.api.partition
+	
+
+PartitionCollector
+	
+
+Sends intermediary results from each partition to a partition analyzer. It is referenced from the collector element inside the partition element.
+
+jakarta.batch.api.partition
+	
+
+PartitionAnalyzer
+	
+
+Processes data and final results from each partition. It is referenced from the analyzer element inside the partition element.
+Listener Batch Artifact Interfaces Package 	Interface 	Description
+
+jakarta.batch.api.listener
+	
+
+JobListener
+	
+
+Intercepts job execution before and after running a job. It is referenced from the listener element inside the job element.
+
+jakarta.batch.api.listener
+	
+
+StepListener
+	
+
+Intercepts step execution before and after running a step. It is referenced from the listener element inside the step element
+
+jakarta.batch.api.chunk.listener
+	
+
+ChunkListener
+	
+
+Intercepts chunk processing in chunk steps before and after processing each chunk, and on errors. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+ItemReadListener
+	
+
+Intercepts item reading in chunk steps before and after reading each item, and on errors. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+ItemProcessListener
+	
+
+Intercepts item processing in chunk steps before and after processing each item, and on errors. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+ItemWriteListener
+	
+
+Intercepts item writing in chunk steps before and after writing each item, and on errors. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+RetryReadListener
+	
+
+Intercepts retry item reading in chunk steps when an exception occurs. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+RetryProcessListener
+	
+
+Intercepts retry item processing in chunk steps when an exception occurs. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+RetryWriteListener
+	
+
+Intercepts retry item writing in chunk steps when an exception occurs. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+SkipReadListener
+	
+
+Intercepts skippable exception handling for item readers in chunk steps. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+SkipProcessListener
+	
+
+Intercepts skippable exception handling for item processors in chunk steps. It is referenced from the listener element inside the step element.
+
+jakarta.batch.api.chunk.listener
+	
+
+SkipWriteListener
+	
+
+Intercepts skippable exception handling for item writers in chunk steps. It is referenced from the listener element inside the step element.
