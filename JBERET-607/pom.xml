@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>in.ashiot</groupId>
+  <artifactId>simpleusecase</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>simpleusecase</name>
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+ 
+    <!--JBeret-->
+    <version.jberet-se-bom>3.1.0.Final</version.jberet-se-bom>
+
+    <!--Core Jakarta-->
+    <version.jakarta.batch-api>2.1.1</version.jakarta.batch-api>
+ 
+    <!--CDI-->
+    <weld.version>6.0.4.Final</weld.version>
+
+    <!--Logging-->
+    <version.org.jboss.logging.jboss-logging>3.6.0.Final</version.org.jboss.logging.jboss-logging>
+
+  </properties>
+
+  <repositories>
+      <repository>
+          <id>jboss-public-repository-group</id>
+          <name>JBoss Public Repository Group</name>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+      </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jberet</groupId>
+        <artifactId>jberet-se-bom</artifactId>
+        <version>${version.jberet-se-bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.11.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+        <groupId>jakarta.batch</groupId>
+        <artifactId>jakarta.batch-api</artifactId>
+        <version>${version.jakarta.batch-api}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.jberet</groupId>
+        <artifactId>jberet-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>      
+    </dependency>
+    <dependency>
+        <groupId>jakarta.inject</groupId>
+        <artifactId>jakarta.inject-api</artifactId>
+    </dependency>
+    <!--For standalone Batch applicaitons-->
+    <dependency>
+        <groupId>org.jberet</groupId>
+        <artifactId>jberet-se</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.weld.se</groupId>
+        <artifactId>weld-se-core</artifactId>
+        <version>${weld.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>jakarta.transaction</groupId>
+        <artifactId>jakarta.transaction-api</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-security-manager</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.jboss.logging</groupId>
+        <artifactId>jboss-logging</artifactId>
+        <version>${version.org.jboss.logging.jboss-logging}</version>
+    </dependency>
+
+<!--Testing-->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.1.1</version>
+          <configuration>
+              <mainClass>in.ashiot.App</mainClass>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
