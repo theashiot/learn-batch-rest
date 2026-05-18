@@ -25,7 +25,6 @@ public class MyBatchlet implements Batchlet {
 
     @Override
     public void stop() throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stop'");
+ 
     }
 }
